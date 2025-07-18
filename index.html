@@ -1,39 +1,127 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>계좌번호 자동 복사</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: sans-serif;
-            background: #f9f9f9;
-            text-align: center;
-        }
-        h1 {
-            color: #4CAF50;
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>계좌번호 자동 복사</title>
+<style>
+  /* 모바일 친화적 레이아웃 */
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Noto Sans KR', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #81c784, #66bb6a);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    color: #fff;
+    text-align: center;
+  }
+  .container {
+    background: #2e7d32;
+    border-radius: 15px;
+    padding: 2rem 2.5rem;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+    max-width: 400px;
+    width: 100%;
+  }
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  p {
+    font-size: 1.2rem;
+    margin: 0.7rem 0;
+    line-height: 1.4;
+  }
+  .highlight {
+    font-weight: 700;
+    font-size: 1.4rem;
+    background: rgba(255 255 255 / 0.2);
+    padding: 0.3rem 0.8rem;
+    border-radius: 8px;
+    user-select: all; /* 복사 쉽게 */
+  }
+  /* 버튼 추가 (클립보드 복사 실패 시 대체 수단) */
+  #copyBtn {
+    margin-top: 1.5rem;
+    padding: 0.7rem 1.2rem;
+    font-size: 1rem;
+    background: #aed581;
+    border: none;
+    border-radius: 10px;
+    color: #2e7d32;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  #copyBtn:hover {
+    background: #c5e1a5;
+  }
+  /* 작은 화면에서 텍스트 크기 조절 */
+  @media (max-width: 400px) {
+    h1 {
+      font-size: 1.5rem;
+    }
+    p {
+      font-size: 1rem;
+    }
+    #copyBtn {
+      font-size: 0.9rem;
+      padding: 0.6rem 1rem;
+    }
+  }
+</style>
 </head>
 <body>
-    <div>
-        <h1>계좌번호가 복사되었습니다 ✅</h1>
-        <p id="account"></p>
-        <p>필요한 곳에 붙여넣기(Ctrl+V) 하세요.</p>
-    </div>
-    <script>
-        const params = new URLSearchParams(window.location.search);
-        const account = params.get("account");
-        document.getElementById("account").innerText = account;
+  <div class="container" role="main" aria-live="polite" aria-atomic="true">
+    <h1>계좌번호가 복사되었습니다 ✅</h1>
+    <p>계좌번호: <span id="account" class="highlight"></span></p>
+    <p>성함: <span id="name" class="highlight"></span></p>
+    <p>송금액: <span id="amount" class="highlight"></span> 원</p>
+    <p>필요한 곳에 붙여넣기(Ctrl+V) 하세요.</p>
+    <button id="copyBtn" style="display:none;">클립보드에 복사하기</button>
+  </div>
 
-        if (account) {
-            navigator.clipboard.writeText(account).catch(err => {
-                alert("클립보드 복사 실패 😢 계좌번호: " + account);
-            });
-        }
-    </script>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const account = params.get("account") || "알 수 없음";
+  const amount = params.get("amount") || "2000";  // 기본 2000원
+  const name = params.get("name") || "이학성";   // 기본 성함
+
+  // 화면에 표시
+  document.getElementById("account").innerText = account;
+  document.getElementById("amount").innerText = amount.toLocaleString();
+  document.getElementById("name").innerText = name;
+
+  const copyBtn = document.getElementById("copyBtn");
+
+  // 클립보드 복사 시도
+  if (navigator.clipboard && account !== "알 수 없음") {
+    navigator.clipboard.writeText(account).then(() => {
+      // 성공 시 버튼 숨김
+      copyBtn.style.display = "none";
+    }).catch(() => {
+      // 실패 시 버튼 보임
+      copyBtn.style.display = "inline-block";
+    });
+  } else {
+    // 클립보드 API 없으면 버튼 보임
+    copyBtn.style.display = "inline-block";
+  }
+
+  // 수동 복사 버튼 기능
+  copyBtn.addEventListener("click", () => {
+    navigator.clipboard.writeText(account).then(() => {
+      alert("계좌번호가 클립보드에 복사되었습니다!");
+      copyBtn.style.display = "none";
+    }).catch(() => {
+      alert("복사에 실패했습니다. 수동으로 복사하세요.");
+    });
+  });
+</script>
 </body>
 </html>
