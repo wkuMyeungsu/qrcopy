@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>계좌번호 자동 복사</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: sans-serif;
+            background: #f9f9f9;
+            text-align: center;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>계좌번호가 복사되었습니다 ✅</h1>
+        <p id="account"></p>
+        <p>필요한 곳에 붙여넣기(Ctrl+V) 하세요.</p>
+    </div>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const account = params.get("account");
+        document.getElementById("account").innerText = account;
+
+        if (account) {
+            navigator.clipboard.writeText(account).catch(err => {
+                alert("클립보드 복사 실패 😢 계좌번호: " + account);
+            });
+        }
+    </script>
+</body>
+</html>
